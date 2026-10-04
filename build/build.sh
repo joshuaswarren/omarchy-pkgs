@@ -369,7 +369,12 @@ build_package() {
   if [[ -n "$pgp_keys" ]]; then
     echo "    Importing PGP keys from validpgpkeys..."
     for key in $pgp_keys; do
-      gpg --receive-keys "$key" 2>/dev/null && echo "      Received $key" || echo "      Failed to receive $key"
+      if gpg --receive-keys --keyserver hkps://keyserver.ubuntu.com "$key" 2>/dev/null \
+         || gpg --receive-keys --keyserver hkps://keys.openpgp.org "$key" 2>/dev/null; then
+        echo "      Received $key"
+      else
+        echo "      Failed to receive $key"
+      fi
     done
   fi
   if [[ -d "keys/pgp" ]]; then

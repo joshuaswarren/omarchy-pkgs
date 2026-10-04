@@ -18,9 +18,10 @@ if [[ -f /build/gpg-keys.txt ]]; then
         echo "      Warning: Failed to import key from $line"
       }
     else
-      # It's a key ID - use receive-keys
+      # It's a key ID - receive from ubuntu first, keys.openpgp.org as fallback
       echo "    - Receiving key $line"
-      gpg --receive-keys "$line" || {
+      gpg --receive-keys --keyserver hkps://keyserver.ubuntu.com "$line" \
+        || gpg --receive-keys --keyserver hkps://keys.openpgp.org "$line" || {
         echo "      Warning: Failed to receive key $line"
       }
     fi

@@ -113,7 +113,11 @@ RUN ln -sf /usr/lib/os-release /etc/os-release && \
 # aarch64 build depend on an aarch64 repository that only that build can
 # create.
 ARG MIRROR=edge
-RUN pacman-key --recv-keys 40DFB630FF42BCFFB047046CF0134EE680CAC571 --keyserver keys.openpgp.org && \
+# The signing key is vendored at build/keys/omarchy-signing.asc so the image
+# build never depends on a public keyserver being up.
+COPY keys/omarchy-signing.asc /tmp/omarchy-signing.asc
+RUN pacman-key --add /tmp/omarchy-signing.asc && \
+    rm -f /tmp/omarchy-signing.asc && \
     pacman-key --lsign-key 40DFB630FF42BCFFB047046CF0134EE680CAC571 && \
     printf '\n[omarchy]\nSigLevel = Optional\nServer = https://pkgs.omarchy.org/%s/x86_64\n' "${MIRROR}" >> /etc/pacman.conf && \
     pacman -Sy --noconfirm && \
