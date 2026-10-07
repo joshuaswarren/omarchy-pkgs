@@ -2,13 +2,13 @@
 
 pkgbase=omarchy-mlx
 pkgname=(omarchy-mlx omarchy-mlx-vulkan)
-pkgver=0.7.30
+pkgver=0.7.31
 pkgrel=1
 arch=('aarch64')
 url='https://github.com/joshuaswarren/omarchy-mlx'
 # The two packages publish together, so the tested wheel and the Vulkan driver
 # it was qualified on can never skew.
-_wheel=mlx_omarchy-0.32.4.dev202610070139+d86daf9-cp314-cp314-linux_aarch64.whl
+_wheel=mlx_omarchy-0.32.4.dev202610071347+9b5c938-cp314-cp314-linux_aarch64.whl
 _vendor=omarchy-mlx-vendor-wheels-v$pkgver-cp314-aarch64.tar
 # The Honeykrisp Vulkan driver: joshuaswarren/mesa-1 honeykrisp-omarchy-v3.
 _mesa_commit=bbbfa36dce7926e8b9212bda4eb4902b6a9c3561
@@ -28,9 +28,9 @@ source=("omarchy-mlx-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz"
         "mesa-$_mesa_commit.tar.gz::https://github.com/joshuaswarren/mesa-1/archive/$_mesa_commit.tar.gz")
 noextract=("$_wheel" "$_vendor")
 sha256sums=(
-            '1eda583aeb147c4d21ffe29155acfa8cbc2a63fa04d81f9aee47ffff3dfa1917'
-            '0a3ab728a801ab6576b98b94d8e2cf979d10f85b1d70be668708de4be243b4c3'
-            '200c4481ca7b7bf7617e1fb1b52aa922f13d01dc9cbb03c574b39fbd1d7f9b6f'
+            '4e83fadd69c732680dfb9d4b1bc984a17a9b29d0bb22a393549db75b703a385b'
+            'a2f8c83e5c5f635d00702565a8557d87c40a9eccac885329dcec4692d85d300d'
+            '1cc390b1e25c55a80c8c21327a39d7e498cafb5144a75b0ff1fc9e6f8b54b074'
             '7677613c36c88ba05300d57d684892ba5a53cb6164fafc811b82f428e886809f'
             )
 
