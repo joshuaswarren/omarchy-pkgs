@@ -15,7 +15,7 @@ _mesa_commit=e7631595df6281748ea5e643d74db59c5f783b01
 # The driver reports this in driverInfo as "git-<sha>"; the runtime compares it.
 _mesa_sha=${_mesa_commit:0:10}
 makedepends=('clang' 'elfutils' 'expat' 'glslang' 'libclc' 'libdrm' 'llvm' 'meson'
-             'python' 'python-mako' 'python-packaging' 'python-yaml'
+             'patch' 'python' 'python-mako' 'python-packaging' 'python-yaml'
              'spirv-llvm-translator' 'spirv-tools' 'zstd')
 # check() imports the staged venv's mlx.core, which loads these shared
 # libraries at import. Per-package depends are not installed at check() time
