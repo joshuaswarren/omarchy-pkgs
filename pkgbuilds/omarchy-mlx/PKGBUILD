@@ -11,7 +11,7 @@ url='https://github.com/joshuaswarren/omarchy-mlx'
 _wheel=mlx_omarchy-0.32.4.dev202610071347+9b5c938-cp314-cp314-linux_aarch64.whl
 _vendor=omarchy-mlx-vendor-wheels-v$pkgver-cp314-aarch64.tar
 # The Honeykrisp Vulkan driver: joshuaswarren/mesa-1 honeykrisp-omarchy-v3.
-_mesa_commit=bbbfa36dce7926e8b9212bda4eb4902b6a9c3561
+_mesa_commit=188dae250e4bf970b529027df03b415119a48114
 # The driver reports this in driverInfo as "git-<sha>"; the runtime compares it.
 _mesa_sha=${_mesa_commit:0:10}
 makedepends=('clang' 'elfutils' 'expat' 'glslang' 'libclc' 'libdrm' 'llvm' 'meson'
@@ -31,7 +31,7 @@ sha256sums=(
             '4e83fadd69c732680dfb9d4b1bc984a17a9b29d0bb22a393549db75b703a385b'
             'a2f8c83e5c5f635d00702565a8557d87c40a9eccac885329dcec4692d85d300d'
             '1cc390b1e25c55a80c8c21327a39d7e498cafb5144a75b0ff1fc9e6f8b54b074'
-            '7677613c36c88ba05300d57d684892ba5a53cb6164fafc811b82f428e886809f'
+            '4b1621b62acdf40b164c27f3001c505388e9ca07d91f45e2ca0d7adc529099c0'
             )
 
 prepare() {
