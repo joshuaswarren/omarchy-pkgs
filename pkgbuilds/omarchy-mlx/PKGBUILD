@@ -3,7 +3,7 @@
 pkgbase=omarchy-mlx
 pkgname=(omarchy-mlx omarchy-mlx-vulkan)
 pkgver=0.7.31
-pkgrel=1
+pkgrel=2
 arch=('aarch64')
 url='https://github.com/joshuaswarren/omarchy-mlx'
 # The two packages publish together, so the tested wheel and the Vulkan driver
@@ -93,7 +93,7 @@ package_omarchy-mlx() {
   license=('MIT')
   groups=('omarchy-platform-apple-silicon')
   depends=("omarchy-mlx-vulkan=$pkgver-$pkgrel" 'python>=3.14' 'python<3.15'
-           'blas' 'gcc-libs' 'glibc' 'lapack' 'openblas' 'vulkan-icd-loader')
+           'blas' 'gcc-libs' 'glibc' 'lapack' 'openblas' 'patch' 'vulkan-icd-loader')
   optdepends=('omarchy-ane-abi: Apple Neural Engine execution on qualified chips (omarchy-ane-dkms)')
   cp -a "$srcdir/stage/usr" "$pkgdir/usr"
 }
