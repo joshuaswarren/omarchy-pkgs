@@ -91,6 +91,12 @@ package_omarchy-mlx() {
   depends=("omarchy-mlx-vulkan=$pkgver-$pkgrel" 'python>=3.14' 'python<3.15'
            'blas' 'gcc-libs' 'glibc' 'lapack' 'openblas' 'vulkan-icd-loader')
   optdepends=('omarchy-ane-abi: Apple Neural Engine execution on qualified chips (omarchy-ane-dkms)')
+  # Refuse to package a stage whose ANE bytes disagree with the wheel's pin.
+  # check() alone is not enough: makepkg --nocheck skips it, and that is how
+  # the local 0.7.10-1/0.7.22-1 builds shipped a foreign libane-strict.so and
+  # worker beside the wheel's untouched pin (jwm1, 2026-10-01/03).
+  python3 "$srcdir/omarchy-mlx-$pkgver/scripts/verify_runtime_assets.py" \
+    "$srcdir/stage/usr/lib/omarchy-mlx/venv/lib/python3.14/site-packages/mlx/share/mlx-omarchy/parakeet-1"
   cp -a "$srcdir/stage/usr" "$pkgdir/usr"
 }
 
