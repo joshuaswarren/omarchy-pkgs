@@ -90,6 +90,7 @@ check() {
 
 package_omarchy-mlx() {
   pkgdesc='MLX for Apple Silicon Macs: GPU inference through Vulkan, with ANE support'
+  install=omarchy-mlx.install
   license=('MIT')
   groups=('omarchy-platform-apple-silicon')
   depends=("omarchy-mlx-vulkan=$pkgver-$pkgrel" 'python>=3.14' 'python<3.15'
