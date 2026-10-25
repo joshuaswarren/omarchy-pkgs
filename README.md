@@ -4,11 +4,20 @@ Build system for the Omarchy Package Repository. Builds PKGBUILDs from local sou
 
 **Multi-Architecture**: Supports both x86_64 and aarch64 (ARM64).
 
+This is a development fork of
+[omacom/omarchy-pkgs](https://github.com/omacom/omarchy-pkgs).
+Use upstream for current recipes and package changes.
+
+## Documentation
+
+- [Direct upstream watches](docs/upstream-sources.md): how `bin/sync-upstream` discovers vendor releases and updates recipes.
+- [CI spike](ci/README.md): building PRs on ephemeral builders (experimental, publishes nothing).
+
 ## PKGBUILDs
 
 Each package lives directly under `pkgbuilds/<package>/` and carries Omarchy metadata in `.omarchy/package.json`.
 
-The filesystem no longer encodes release policy. Instead:
+The filesystem does not encode release policy; metadata does:
 
 - there are three channels forming a forward-only pipeline: `edge` → `rc` → `stable`
 - all packages build for `edge` unless their metadata pins `channels`
@@ -36,6 +45,11 @@ The filesystem no longer encodes release policy. Instead:
 - packages follow direct upstream watches/providers in `.omarchy/package.json`, or a custom `.omarchy/upstream.sh` hook
 
 ## Prerequisites
+
+The repository host needs Docker (or rootless Podman), rclone, bsdtar,
+jq, git and rsync. makepkg and signing run inside containers. `bin/setup`
+installs and checks host dependencies; see [Installation](#installation).
+
 ### aarch64 Builds (Optional)
 
 The repository host builds every architecture it publishes on the same
@@ -586,7 +600,7 @@ bin/repo list --repo --mirror stable # List packages in a published repo databas
 bin/package-worktree yay            # Compare with the original imported AUR recipe
 ```
 
-## Cutting an Omarchy Release
+## Omarchy version pinning
 
 The `omarchy` and `omarchy-settings` packages are released as a pair, always
 built from the same upstream commit of basecamp/omarchy.
@@ -821,8 +835,8 @@ The build system automatically handles inter-package dependencies:
 Example: If `aether` depends on `hyprshade`, `hyprshade` is built first.
 
 Isolation also lets the release and dev Omarchy pairs build in the same run:
-Flea can install `omarchy` without preventing `omarchy-dev` from installing
-its conflicting settings package in a different container.
+one container installs `omarchy` while another installs `omarchy-dev` and its
+conflicting settings package.
 
 Pacman downloads are cached under `cache/pacman/<channel>/<arch>/` across
 containers and runs. The installed package database is never shared. Each
@@ -969,43 +983,35 @@ queued, what is failing and when it will retry, and whether the lock is held.
 
 ### Build reports
 
-Every release run reports to Basecamp Campfire — not just failures, so a push
-can be followed all the way to the mirror without watching the host:
+Release runs report successes and failures to a Basecamp chat, so a push
+can be followed to the mirror without watching the host:
 
 | Event | Message |
 |---|---|
 | 🔨 Started | channel, arch, host, the commit being built, and which packages are queued |
 | ✅ Published | the packages and versions that went out, duration, and the channel URL |
 | 📦 Promoted | what `advance` moved between channels (including the rc bootstrap and fast-ring replication) |
-| 📦 Nothing to publish | a queued run built nothing — see below |
+| 📦 Nothing to publish | a queued run built nothing |
 | 🔴 Failed | which step failed, the commit, and the last 25 log lines |
 
-Reports are tied to release *runs*, not timer ticks: a tick with nothing
-queued exits silently, so a quiet day is a quiet chat. That is what makes the
-"nothing to publish" report meaningful rather than routine — a release only
-runs when the version check queued work, so building nothing means the check
-and the builder disagree about what is out of date. It names the packages that
-were queued but not built, which is where to start looking.
+A "nothing to publish" report means the version check queued work that the
+builder did not build. It names the packages to inspect.
 
-By default everything posts to `BASECAMP_CHATBOT_URL`, the same chat the
-AUR/upstream sync workflows use — one variable, nothing extra to configure.
-
-If release traffic starts drowning that chat, give it its own: create a second
-Basecamp chat, add a chatbot integration to it, and export its lines URL
-alongside the existing one in `/root/.omarchy/build-credentials`:
+Reports post to `BASECAMP_CHATBOT_URL`, the same chat the sync workflows
+use. To give release reports their own chat, create a second Basecamp chat,
+add a chatbot integration to it, and export its lines URL alongside the
+existing one in `/root/.omarchy/build-credentials`:
 
 ```bash
 export OMARCHY_RELEASE_CHATBOT_URL="https://3.basecamp.com/<account>/integrations/<key>/buckets/<project>/chats/<chat>/lines"
 ```
 
-Release reports then go there while the sync workflows keep posting to
-`BASECAMP_CHATBOT_URL`. With neither set, reports are silently skipped.
-`bin/setup` reports which of the three cases applies.
+With neither variable set, reports are silently skipped. `bin/setup` reports
+which case applies.
 
-Check on all of it with `bin/repo timers` — schedule, each unit's last run and
-whether it succeeded, what is queued, whether a release is running right now,
-and any failed units. Like the other host commands it forwards over ssh, so
-the build box's state is one command away from any machine:
+`bin/repo timers` shows the schedule, each unit's last run and whether it
+succeeded, what is queued, whether a release is running right now, and any
+failed units. Like the other host commands it forwards over ssh:
 
 ```bash
 bin/repo timers           # runs on the repository host when one is configured
