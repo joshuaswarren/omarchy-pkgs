@@ -11,7 +11,7 @@ url='https://github.com/joshuaswarren/omarchy-ane'
 license=('GPL-2.0-only OR MIT')
 # omarchy-ane carries the tools, the libalpm hooks and the device-tree overlays; this
 # package carries only the module source that dkms builds.
-depends=('dkms' "omarchy-ane=$pkgver")
+depends=('dkms' 'omarchy-ane>=0.5.6')
 checkdepends=('fakeroot' 'linux-aurora-headers')
 optdepends=('linux-aurora-headers: build the modules for linux-aurora'
             'linux-asahi-headers: build the modules for linux-asahi')
