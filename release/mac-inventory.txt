@@ -23,6 +23,7 @@ linux-aurora 7.2.11.aurora10-1
 m1n1-aurora 1.6.1.aurora22-1
 mesa-aurora 1:26.3.0_devel.20261029.231476.672657e05e6-2
 mil-hwx-compiler 0.1.0-1
+omarchy-ane none
 omarchy-ane-dkms 0.5.3-1
 omarchy-aurora-firmware 20261014-7
 omarchy-mac 0.2.3-1
