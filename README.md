@@ -1086,3 +1086,7 @@ rm /root/omarchy-pkgs/pkgs.omarchy.org/.release.lock
 
 The main checkout is pulled by `check-versions` on its 5-minute tick, so the
 host stays current on whatever branch it has checked out — it must be `master`.
+
+## Contributors
+
+Everyone credited so far: [CONTRIBUTORS.md](CONTRIBUTORS.md).
