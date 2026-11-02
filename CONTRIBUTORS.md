@@ -46,6 +46,7 @@
 - [@tobi](https://github.com/tobi)
 - [@TsaiGaggery](https://github.com/TsaiGaggery)
 - [@zz8011](https://github.com/zz8011)
+
 _Linked GitHub accounts only. Anonymous (unlinked) commit authors are
 enumerable through the API (anon=true) but are identified there only by
 name/email, which this registry does not publish; credit them by hand in
