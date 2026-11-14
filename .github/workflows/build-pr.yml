@@ -180,7 +180,9 @@ jobs:
     # took 2h47m of the 180 minutes, most of it in check().
     # GitHub's arm64 runners (4 vCPU, 16 GB; ~100 GB disk free in our pilots)
     # build it natively in 11 minutes, and linux-aurora in 30 (72 under QEMU).
-    runs-on: ${{ matrix.arch == 'aarch64' && 'ubuntu-24.04-arm' || fromJSON('["self-hosted","omarchy-builder"]') }}
+    # Forks have no omarchy-builder pool, so their x86_64 builds use GitHub's
+    # x86 runners (free on a public fork) instead of queuing forever.
+    runs-on: ${{ matrix.arch == 'aarch64' && 'ubuntu-24.04-arm' || (github.repository_owner == 'omacom' && fromJSON('["self-hosted","omarchy-builder"]') || 'ubuntu-24.04') }}
     timeout-minutes: 180
     strategy:
       fail-fast: false
