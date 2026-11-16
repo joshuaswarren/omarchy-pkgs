@@ -92,7 +92,25 @@ build() {
   LC_ALL=C find "$srcdir/stage" -name '*[! -~]*' -delete
 }
 
+# The sync rewrites pkgver and the checksums, never _mesa_commit. From 0.7.47 each release records the Mesa commit it was
+# qualified on, and a release that needs another driver fails here until a person moves the pin.
+# 0.7.46 and older were cut before the file existed.
+_check_qualified_mesa() {
+  (( $(vercmp "$pkgver" 0.7.46) > 0 )) || return 0
+  local file="$srcdir/omarchy-mlx-$pkgver/packaging/qualified-mesa-commit" recorded
+  if [[ ! -f $file ]]; then
+    error "release v$pkgver records no qualified Mesa commit (packaging/qualified-mesa-commit)"
+    return 1
+  fi
+  recorded=$(<"$file")
+  if [[ $recorded != "$_mesa_commit" ]]; then
+    error "release v$pkgver was qualified on Mesa $recorded but this recipe pins $_mesa_commit: review the driver, then move _mesa_commit and the Mesa checksum"
+    return 1
+  fi
+}
+
 check() {
+  _check_qualified_mesa
   grep -aq "(git-$_mesa_sha)" "$srcdir/mesa-stage/usr/lib/libvulkan_asahi.so"
   "$srcdir/stage/usr/lib/omarchy-mlx/venv/bin/python" \
     -c 'import mlx.core, mlx_omarchy_paths, mlx_omarchy_serve'
