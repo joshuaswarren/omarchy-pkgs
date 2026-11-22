@@ -3,7 +3,7 @@
 pkgname=omarchy-ane-dkms
 _srcname=omarchy-ane
 pkgver=0.5.13
-pkgrel=1
+pkgrel=1  # SLOT(G615-ane-h18-tag): pkgver follows the tag above
 pkgdesc='Apple Neural Engine kernel modules for Apple Silicon Macs (DKMS, for kernels without the in-tree driver)'
 arch=('aarch64')
 groups=('omarchy-platform-apple-silicon')
@@ -31,6 +31,11 @@ prepare() {
   cp -r "$src/dkms.conf" "$dst/"
   cp -r "$src/ane/Makefile" "$src/ane/ane_stats_show.c" "$src/ane/include" \
     "$src/ane/src" "$src/ane/t6021" "$dst/ane/"
+  # G615 (M6, T8152): ane_h18 ships as DKMS source, never as a staged ko: a ko is
+  # vermagic-locked to one build of 7.1.12-aurora-m6usb-ARCH and breaks on any rebuild.
+  # SLOT(G615-ane-h18-tag): needs an omarchy-ane release tag that carries ane/h18 and its
+  # dkms.conf BUILT_MODULE entry; bump pkgver/sha256sums to that tag before merge.
+  cp -r "$src/ane/h18" "$dst/ane/"
   sed -i "s/@PKGVER@/$pkgver/" "$dst/dkms.conf"
 }
 
@@ -45,7 +50,7 @@ check() {
   local rc=0
   fakeroot dkms "${dkms_options[@]}" build "$_srcname/$pkgver" || rc=$?
   case $rc in
-    0) ls "$srcdir/check/dkms/$_srcname/$pkgver/$kver"/*/module/{ane,ane_t6021}.ko* ;;
+    0) ls "$srcdir/check/dkms/$_srcname/$pkgver/$kver"/*/module/{ane,ane_t6021,ane_h18}.ko* ;;
     77)
       # dkms.conf BUILD_EXCLUSIVE_CONFIG="!CONFIG_DRM_ACCEL_ANE": a kernel that
       # ships the in-tree ANE driver keeps its own modules.

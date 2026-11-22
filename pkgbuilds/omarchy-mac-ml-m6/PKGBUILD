@@ -1,0 +1,19 @@
+# Maintainer: Joshua Warren <816217+joshuaswarren@users.noreply.github.com>
+
+# Draft skeleton: the M6 opt-in ML set. Mirrors omarchy-mac-ml-m5 (G524).
+# Open slots before this ships:
+# - linux-aurora-m6: the pinned 7.1.12-aurora-m6usb-ARCH kernel has no recipe;
+#   its source commit e7bc22d7 is not on a public remote (G607). Never
+#   substitute linux-aurora here: it has no t8152 DT, no nub-gpio fix.
+# - omarchy-mlx wheel pin (SLOT G609 in pkgbuilds/omarchy-mlx).
+# - ane_h18 in omarchy-ane-dkms needs an omarchy-ane tag carrying ane/h18
+#   (SLOT G615-ane-h18-tag).
+pkgname=omarchy-mac-ml-m6
+pkgver=0
+pkgrel=1
+pkgdesc='MLX on the GPU and Core ML models on the Neural Engine for M6 Macs (draft package set)'
+arch=('aarch64')
+groups=('omarchy-platform-apple-silicon')
+url='https://github.com/omacom/omarchy-pkgs'
+license=('MIT')
+depends=('linux-aurora-m6' 'omarchy-mlx' 'omarchy-mlx-vulkan-m6' 'omarchy-ane' 'omarchy-ane-dkms' 'mil-hwx-compiler')

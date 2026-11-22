@@ -8,6 +8,8 @@ arch=('aarch64')
 url='https://github.com/joshuaswarren/omarchy-mlx'
 # The two packages publish together, so the tested wheel and the Vulkan driver
 # it was qualified on can never skew.
+# SLOT(G609-wheel-pin): the M6 (T8152) row ships only once G609's m6-qual receipt names the
+# qualified wheel; set _wheel and its sha256 to that wheel, or keep this one if G609 qualifies it.
 _wheel=mlx_omarchy-0.32.4.dev202611101859+7ec53476-cp314-cp314-linux_aarch64.whl
 _vendor=omarchy-mlx-vendor-wheels-v$pkgver-cp314-aarch64.tar
 # The Honeykrisp Vulkan driver: joshuaswarren/mesa-1 w7b/hk-lineage-hoist-bf16 (honeykrisp-omarchy-v3 plus the G14X tracked CDM barrier, bf16 cooperative matrices, the G13 compute load hoist and the SPIR-V image availability fix).

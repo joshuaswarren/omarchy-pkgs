@@ -1,0 +1,84 @@
+# Maintainer: Joshua Warren <816217+joshuaswarren@users.noreply.github.com>
+
+# The Honeykrisp Vulkan driver for omarchy-mlx on M6 (G18G) only. It replaces
+# omarchy-mlx-vulkan, which stays on the M1-M4 driver; omarchy-mac-ml-m6 pulls
+# it in. Its mesa-git-sha names G18G, so omarchy-mlx refuses it on other GPUs
+# (same gate as omarchy-mlx #637).
+pkgname=omarchy-mlx-vulkan-m6
+pkgver=0
+pkgrel=1
+pkgdesc='Honeykrisp Vulkan driver for omarchy-mlx on M6 Macs only (G18G, draft)'
+arch=('aarch64')
+url='https://github.com/joshuaswarren/mesa-1'
+license=('MIT AND BSD-3-Clause AND SGI-B-2.0')
+groups=('omarchy-platform-apple-silicon')
+# The qualified G18G build (receipts/2026-11-15-w91-vulkan-g18-j873/, installed
+# on the M6 as omarchy-mlx-vulkan-g18 1:26.1.4.j873.12e05a5250-1):
+# aurora-silicon/mesa-aurora branch w91/int2 = j873 head 16c2967dff3 plus
+# PR #38 (G18G immediate bit-op wait prelude), #39 (imad negated addend) and
+# #40 (mixed-width fcmp select). mesa-aurora is private and w91/int2 was
+# deleted upstream, so the exact commit is mirrored on public
+# joshuaswarren/mesa-1 branch m6-g18g-int2 at this same SHA.
+_mesa_commit=12e05a52500d4a9c4e41987c841cf009c0c71540
+_mesa_sha=${_mesa_commit:0:10}
+_chip=G18G
+# SLOT: the omarchy-mlx release this driver is qualified with. 0.7.40-3 is the
+# master's own release; the census m6 ran the pin with omarchy-mlx 0.7.47-1.
+_mlx_release=0.7.40-3
+depends=('expat' 'gcc-libs' 'glibc' 'libdrm' 'libelf' 'llvm-libs' 'spirv-tools' 'zstd')
+makedepends=('clang' 'elfutils' 'expat' 'glslang' 'libclc' 'libdrm' 'llvm' 'meson'
+             'python' 'python-mako' 'python-packaging' 'python-yaml'
+             'spirv-llvm-translator' 'spirv-tools' 'zstd')
+provides=("omarchy-mlx-vulkan=$_mlx_release")
+conflicts=('omarchy-mlx-vulkan' 'mesa-honeykrisp-omarchy')
+options=('!debug' '!lto')
+source=("mesa-$_mesa_commit.tar.gz::https://github.com/joshuaswarren/mesa-1/archive/$_mesa_commit.tar.gz")
+sha256sums=('d4cf1e79df7b06aa54e0c7fa26efc10b278455509f85e1f2e63d773669118ee8')
+
+build() {
+  export MESA_GIT_SHA1_OVERRIDE=$_mesa_sha
+  meson setup "mesa-1-$_mesa_commit" build-mesa \
+    --prefix=/usr \
+    --libdir=lib \
+    --buildtype=release \
+    -Db_ndebug=true \
+    -Dvulkan-drivers=asahi \
+    -Dgallium-drivers= \
+    -Dplatforms= \
+    -Dvulkan-layers= \
+    -Dopengl=false \
+    -Dgles1=disabled \
+    -Dgles2=disabled \
+    -Degl=disabled \
+    -Dgbm=disabled \
+    -Dglx=disabled \
+    -Dllvm=enabled \
+    -Dshared-llvm=enabled \
+    -Dvalgrind=disabled \
+    -Dbuild-tests=false
+  meson compile -C build-mesa
+  DESTDIR="$srcdir/mesa-stage" meson install -C build-mesa
+}
+
+check() {
+  grep -aq "(git-$_mesa_sha)" "$srcdir/mesa-stage/usr/lib/libvulkan_asahi.so"
+}
+
+package() {
+  local dir=/usr/lib/omarchy-mlx/vulkan
+  install -Dm755 "$srcdir/mesa-stage/usr/lib/libvulkan_asahi.so" "$pkgdir$dir/libvulkan_asahi.so"
+  python - "$srcdir/mesa-stage/usr/share/vulkan/icd.d/asahi_icd.aarch64.json" \
+    "$pkgdir$dir/honeykrisp_icd.aarch64.json" "$dir/libvulkan_asahi.so" <<'PY'
+import json, sys
+src, dst, lib = sys.argv[1:]
+manifest = json.load(open(src))
+manifest["ICD"]["library_path"] = lib
+with open(dst, "w") as f:
+    json.dump(manifest, f, indent=4)
+    f.write("\n")
+PY
+  chmod 644 "$pkgdir$dir/honeykrisp_icd.aarch64.json"
+  printf '%s %s\n' "$_mesa_sha" "$_chip" | install -Dm644 /dev/stdin "$pkgdir$dir/mesa-git-sha"
+  install -Dm644 "$srcdir/mesa-1-$_mesa_commit/docs/license.rst" \
+    "$pkgdir/usr/share/licenses/$pkgname/license.rst"
+}
