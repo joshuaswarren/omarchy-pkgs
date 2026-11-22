@@ -1,0 +1,13 @@
+[Unit]
+Description=Local reply model for omarchy-voice (loopback only)
+ConditionPathExists=%h/.config/omarchy-voice/voice.env
+
+[Service]
+EnvironmentFile=%h/.config/omarchy-voice/voice.env
+Environment=MLX_OMARCHY_OFFLINE=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
+ExecStart=/usr/bin/omarchy-mlx-serve serve --offline --host 127.0.0.1 --port ${REPLY_PORT} ${REPLY_MODEL}
+Restart=on-failure
+RestartSec=15
+
+[Install]
+WantedBy=default.target

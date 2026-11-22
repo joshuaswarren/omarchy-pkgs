@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Run the voice assistant offline. omarchy-voice-models writes the config.
+set -euo pipefail
+conf="${XDG_CONFIG_HOME:-$HOME/.config}/omarchy-voice/voice.env"
+if [[ ! -r $conf ]]; then
+  echo "omarchy-voice: no models yet; run omarchy-voice-models once (it needs the network)" >&2
+  exit 1
+fi
+# shellcheck source=/dev/null
+source "$conf" # VOICE_HOME, WAKE_MODEL, REPLY_PORT
+export MLX_OMARCHY_OFFLINE=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
+exec /usr/lib/omarchy-mlx/venv/bin/python -m mlx_omarchy_assistant.voice_loop \
+  --home "$VOICE_HOME" --wake-model "$WAKE_MODEL" \
+  --reply-url "http://127.0.0.1:$REPLY_PORT/v1/chat/completions" "$@"

@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# The one networked step: fetch and verify every model omarchy-voice uses.
+#   omarchy-voice-models [reply-model]
+# reply-model is a catalog id or HF repo; the default is omarchy-mlx-serve's
+# pick for this Mac. Run it again to change the reply model.
+set -euo pipefail
+home="${XDG_DATA_HOME:-$HOME/.local/share}/omarchy-voice"
+conf_dir="${XDG_CONFIG_HOME:-$HOME/.config}/omarchy-voice"
+wake="${OMARCHY_VOICE_WAKE:-hey_jarvis}"
+port="${OMARCHY_VOICE_PORT:-8080}"
+mkdir -p "$home" "$conf_dir"
+# Wake word, silero VAD, Parakeet and Kokoro, pinned and hash-checked.
+/usr/lib/omarchy-mlx/venv/bin/python -m mlx_omarchy_assistant.voice_loop \
+  --home "$home" --wake-model "$wake" --prepare
+# The reply model: downloaded and checked, not started.
+omarchy-mlx-serve pull --yes ${1:+"$1"} | tee "$conf_dir/reply-model.txt"
+reply="$(sed -n 's/^target: *//p' "$conf_dir/reply-model.txt" | tail -1)"
+[[ -n $reply ]] || { echo "omarchy-voice-models: omarchy-mlx-serve pull named no target" >&2; exit 1; }
+printf 'VOICE_HOME=%q\nWAKE_MODEL=%q\nREPLY_PORT=%q\nREPLY_MODEL=%q\n' \
+  "$home" "$wake" "$port" "$reply" > "$conf_dir/voice.env"
+echo "ready: systemctl --user enable --now omarchy-voice-reply.service omarchy-voice.service"

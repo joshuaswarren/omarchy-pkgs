@@ -1,0 +1,13 @@
+[Unit]
+Description=Offline voice assistant (wake word, Parakeet, local reply, Kokoro)
+ConditionPathExists=%h/.config/omarchy-voice/voice.env
+Wants=omarchy-voice-reply.service pipewire.service
+After=omarchy-voice-reply.service pipewire.service
+
+[Service]
+ExecStart=/usr/bin/omarchy-voice
+Restart=on-failure
+RestartSec=15
+
+[Install]
+WantedBy=default.target

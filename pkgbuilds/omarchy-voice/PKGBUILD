@@ -1,0 +1,26 @@
+# Maintainer: Joshua Warren <816217+joshuaswarren@users.noreply.github.com>
+
+# Hands-free offline voice assistant on omarchy-mlx: wake word, Parakeet
+# speech-to-text, a local reply model, Kokoro speech, played through PipeWire
+# so speakerguardd protects the speakers. omarchy-voice-models is the only
+# step that uses the network; omarchy-voice runs offline.
+pkgname=omarchy-voice
+pkgver=0
+pkgrel=1
+pkgdesc='Offline voice assistant for Apple Silicon Macs (MLX on the GPU, local models only; draft)'
+arch=('aarch64')
+url='https://github.com/joshuaswarren/omarchy-mlx'
+license=('MIT')
+groups=('omarchy-platform-apple-silicon')
+# SLOT: the floor becomes the first omarchy-mlx release with the vendored voice
+# set (omarchy-mlx #646) and the download-only commands the models step calls.
+depends=('omarchy-mlx>=0.7.50' 'speakerguardd' 'portaudio' 'pipewire')
+source=('omarchy-voice' 'omarchy-voice-models' 'omarchy-voice.service' 'omarchy-voice-reply.service')
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP')
+
+package() {
+  install -Dm755 omarchy-voice "$pkgdir/usr/bin/omarchy-voice"
+  install -Dm755 omarchy-voice-models "$pkgdir/usr/bin/omarchy-voice-models"
+  install -Dm644 omarchy-voice.service "$pkgdir/usr/lib/systemd/user/omarchy-voice.service"
+  install -Dm644 omarchy-voice-reply.service "$pkgdir/usr/lib/systemd/user/omarchy-voice-reply.service"
+}
