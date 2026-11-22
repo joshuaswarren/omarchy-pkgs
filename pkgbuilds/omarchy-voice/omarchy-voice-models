@@ -12,8 +12,8 @@ mkdir -p "$home" "$conf_dir"
 # Wake word, silero VAD, Parakeet and Kokoro, pinned and hash-checked.
 /usr/lib/omarchy-mlx/venv/bin/python -m mlx_omarchy_assistant.voice_loop \
   --home "$home" --wake-model "$wake" --prepare
-# The reply model: downloaded and checked, not started.
-omarchy-mlx-serve pull --yes ${1:+"$1"} | tee "$conf_dir/reply-model.txt"
+# The reply model: you approve the download; it is checked, not started.
+omarchy-mlx-serve pull ${1:+"$1"} | tee "$conf_dir/reply-model.txt"
 reply="$(sed -n 's/^target: *//p' "$conf_dir/reply-model.txt" | tail -1)"
 [[ -n $reply ]] || { echo "omarchy-voice-models: omarchy-mlx-serve pull named no target" >&2; exit 1; }
 printf 'VOICE_HOME=%q\nWAKE_MODEL=%q\nREPLY_PORT=%q\nREPLY_MODEL=%q\n' \
