@@ -1,0 +1,42 @@
+# Maintainer: Joshua Warren (lab build, wAP). Local package, not published.
+# llama.cpp's llama-server built with the Vulkan backend for aarch64 (Apple GPUs through the
+# system Vulkan ICD: asahi_icd.aarch64.json, or the lab honeykrisp ICDs from vulkan-g18).
+# This is the packaged runtime Darkhorse's engine resolves at /usr/bin/llama-server
+# (names.PACKAGE_LLAMA_SERVER, darkhorse PR #699), so a hand-placed binary in ~/.local/bin
+# can no longer shadow it - the M5 ran an unpackaged 0.9.0-dev cd959ba build with no Vulkan
+# backend (llama-server --list-devices empty; runtime-device-readback.log, 2026-11-25).
+# Build flags mirror the lab's known-good Vulkan build (dhp5-vision, tag v1.0.0 b1b770d,
+# -DGGML_VULKAN=ON -DGGML_NATIVE=ON; see omarchy-local-ai's images/llamacpp for the container
+# variant, which is x86 AMD/Intel only).
+pkgname=llama-cpp-vulkan
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="llama.cpp llama-server with the Vulkan backend (aarch64, Apple GPUs via the system ICD)"
+arch=('aarch64')
+url="https://github.com/ggml-org/llama.cpp"
+license=('MIT')
+depends=('vulkan-icd-loader' 'gcc-libs' 'glibc' 'curl')
+makedepends=('cmake' 'ninja' 'vulkan-headers' 'shaderc')
+source=("llama.cpp-$pkgver.tar.gz::https://github.com/ggml-org/llama.cpp/archive/refs/tags/v$pkgver.tar.gz")
+sha256sums=('3f5f750e36326aea4d65c7623e7d597a33e395d65f4d76e5e0532171f252532b')
+
+build() {
+  cmake -S "llama.cpp-$pkgver" -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DGGML_VULKAN=ON \
+    -DGGML_NATIVE=ON \
+    -DBUILD_SHARED_LIBS=ON \
+    -DLLAMA_BUILD_TESTS=OFF \
+    -DLLAMA_BUILD_EXAMPLES=OFF \
+    -DLLAMA_BUILD_SERVER=ON
+  cmake --build build --target llama-server -j"$(nproc)"
+}
+
+check() {
+  ./build/bin/llama-server --version
+}
+
+package() {
+  install -Dm755 build/bin/llama-server "$pkgdir/usr/bin/llama-server"
+  install -Dm644 "llama.cpp-$pkgver/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}
